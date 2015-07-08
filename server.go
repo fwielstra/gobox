@@ -6,6 +6,7 @@ import (
 	"github.com/microcosm-cc/bluemonday"
 	"io"
 	"log"
+	"math"
 	"net/http"
 	"time"
 )
@@ -59,7 +60,11 @@ func main() {
 				writeError(http.StatusBadRequest, "Unable to parse JSON: "+error.Error(), w)
 			} else {
 				fmt.Printf("new poast: %+v\n", newPoast)
-				poasts = append(poasts, newPoast)
+				newPoasts := []poast{newPoast}
+				poasts = append(newPoasts, poasts...)
+				// save max 100 messages. Arbitrary limit.
+				max := int(math.Min(float64(len(poasts)), 100))
+				poasts = poasts[:max]
 				writePoasts(w)
 			}
 		}
