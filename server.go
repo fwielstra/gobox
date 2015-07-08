@@ -70,6 +70,11 @@ func main() {
 		}
 	})
 
+	// serve client.html file
+	http.HandleFunc("/client.html", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "static/client.html")
+	})
+
 	hoast := "localhost:8080"
 	log.Print("Starting gobox server at " + hoast)
 	log.Fatal(http.ListenAndServe(hoast, nil))

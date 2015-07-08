@@ -1,0 +1,107 @@
+<html>
+  <head>
+  </head>
+  <body>
+    <h1>box of shouts</h1>
+
+    <form id="shoutbox-form">
+      <input type="text" id="naem" placeholder="naem">
+      <input type="text" id="poast" placeholder="poast">
+
+      <button type="submit">Send your message</button>
+    </form>
+
+    <!-- poasts go here -->
+    <div id="poasts">
+
+    </div>
+
+  </body>
+
+  <footer>
+  <script type="text/javascript">
+
+    function isBlank(str) {
+        return (!str || /^\s*$/.test(str))
+    }
+
+    var form = document.querySelector("#shoutbox-form")
+    form.onsubmit = function submitForm(event) {
+      event.preventDefault()
+
+      var naemElement = form.elements["naem"]
+      var poastElement = form.elements["poast"]
+
+      var message = {
+        Username: naemElement.value,
+        Poast: poastElement.value
+      }
+
+      if (isBlank(message.Username) || isBlank(message.Poast)) {
+        alert("Fill in a username and message y0")
+        return
+      }
+
+      poastElement.value = "" // boom!
+
+      var request = new XMLHttpRequest()
+      request.onload = poastRequestListener
+      request.open("POST", "/poast")
+      request.send(JSON.stringify(message))
+
+      return false
+    }
+
+    function poastRequestListener() {
+      poasts = JSON.parse(this.responseText)
+      poasts.forEach(function (poast) {
+        poast.Poasted = new Date(Date.parse(poast.Poasted))
+      })
+
+      poasts.sort(function (a, b) {
+          return a.Poasted.getTime() - b.Poasted.getTime()
+      }).reverse()
+
+      // clear shit. Stoopid imo.
+      var poastContainer = document.querySelector("#poasts")
+      while (poastContainer.firstChild) {
+          poastContainer.removeChild(poastContainer.firstChild)
+      }
+
+      poasts.forEach(function(poast) {
+        var timeSpan = document.createElement("span")
+        timeSpan.className = "poasted"
+        var poasted = new Date(poast.Poasted)
+        timeSpan.appendChild(document.createTextNode("[" + poasted.getHours() + ":" + poasted.getMinutes() + ":" + poasted.getSeconds() + "] "))
+
+        var usernameSpan = document.createElement("span")
+        usernameSpan.className = "username"
+        usernameSpan.appendChild(document.createTextNode(poast.Username + ": "))
+
+        var poastSpan = document.createElement("span")
+        poastSpan.className = "poast"
+        poastSpan.appendChild(document.createTextNode(poast.Poast))
+
+        var poastDiv = document.createElement("div")
+        poastDiv.appendChild(timeSpan)
+        poastDiv.appendChild(usernameSpan)
+        poastDiv.appendChild(poastSpan)
+
+        poastContainer.appendChild(poastDiv)
+      })
+    }
+
+    function loadNewPoasts() {
+      console.log("Loading new poasts")
+
+      var request = new XMLHttpRequest()
+      request.onload = poastRequestListener
+      request.open("GET", "/poast")
+      request.send()
+    }
+
+    setInterval(loadNewPoasts, 5000)
+    loadNewPoasts()
+
+  </script>
+</html>
