@@ -8,6 +8,7 @@ import (
 	"log"
 	"math"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -46,9 +47,9 @@ func parsePoast(r io.Reader) (poast, error) {
 }
 
 var jsonCache []byte
+var lastUpdated time.Time
 
 func writePoasts(w http.ResponseWriter) {
-	w.Header().Set("Content-Type", "application/json")
 	if len(jsonCache) == 0 {
 		println("JSON cache is empty, refreshing")
 		marshald, err := json.Marshal(poasts)
@@ -57,9 +58,12 @@ func writePoasts(w http.ResponseWriter) {
 			return
 		}
 
+		lastUpdated = time.Now()
 		jsonCache = marshald
 	}
 
+	w.Header().Set("etag", strconv.FormatInt(lastUpdated.Unix(), 10))
+	w.Header().Set("Content-Type", "application/json")
 	w.Write(jsonCache)
 }
 
@@ -75,7 +79,13 @@ func main() {
 	http.HandleFunc("/poast", func(w http.ResponseWriter, r *http.Request) {
 
 		if r.Method == "GET" {
-			writePoasts(w)
+			println(r.Header.Get("etag"), "last updated: "+strconv.FormatInt(lastUpdated.Unix(), 10), "is equal", r.Header.Get("etag") == strconv.FormatInt(lastUpdated.Unix(), 10))
+			if r.Header.Get("etag") == strconv.FormatInt(lastUpdated.Unix(), 10) {
+				w.Header().Set("etag", strconv.FormatInt(lastUpdated.Unix(), 10))
+				w.WriteHeader(http.StatusNotModified)
+			} else {
+				writePoasts(w)
+			}
 		}
 
 		if r.Method == "POST" {

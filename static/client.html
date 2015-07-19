@@ -63,7 +63,17 @@
       return poast.replace(":monster:", "<img src=\"http://thelifestream.net/forums/images/smilies/cookiemonster.gif\">");
     }
 
+    var etag
+
     function poastRequestListener() {
+
+      if (etag === this.getResponseHeader("etag")) {
+        // nothing changed, do nothing
+        return
+      }
+
+      etag = this.getResponseHeader("etag")
+
       var poasts = JSON.parse(this.responseText)
       poasts.forEach(function (poast) {
         poast.Poasted = new Date(Date.parse(poast.Poasted))
@@ -136,6 +146,7 @@
       var request = new XMLHttpRequest()
       request.onload = poastRequestListener
       request.open("POST", "/poast")
+      request.setRequestHeader("etag", etag)
       request.send(JSON.stringify(message))
 
       return false
@@ -147,6 +158,9 @@
       var request = new XMLHttpRequest()
       request.onload = poastRequestListener
       request.open("GET", "/poast")
+      if (etag) {
+        request.setRequestHeader("etag", etag)
+      }
       request.send()
     }
 
