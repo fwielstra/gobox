@@ -34,9 +34,22 @@ func parsePoast(r io.Reader) (poast, error) {
 	return rawPoast, parseError
 }
 
+var jsonCache []byte
+
 func writePoasts(w http.ResponseWriter) {
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(poasts)
+	if len(jsonCache) == 0 {
+		println("JSON cache is empty, refreshing")
+		marshald, err := json.Marshal(poasts)
+		if err != nil {
+			writeError(1, "Unable to marshal json: "+err.Error(), w)
+			return
+		}
+
+		jsonCache = marshald
+	}
+
+	w.Write(jsonCache)
 }
 
 func writeError(code int, error string, w http.ResponseWriter) {
@@ -65,6 +78,9 @@ func main() {
 				// save max 100 messages. Arbitrary limit.
 				max := int(math.Min(float64(len(poasts)), 100))
 				poasts = poasts[:max]
+
+				// clear json cache
+				jsonCache = []byte{}
 				writePoasts(w)
 			}
 		}
