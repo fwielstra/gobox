@@ -6,10 +6,8 @@
   "eqeqeq": true,
   "esnext": true,
   "globals": {
-    "angular": false,
-    "$": false,
-    "Highcharts": false,
-    "_": true
+    "console":false,
+    "alert": false
   },
   "globalstrict": false,
   "immed": true,
@@ -23,6 +21,6 @@
   "strict": false,
   "trailing": true,
   "undef": true,
-  "unused": true
+  "unused": true,
   "asi":true
 }
