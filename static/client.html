@@ -54,6 +54,11 @@
         return
       }
 
+      if (message.Username.length > 20) {
+        alert("Username too long; max 20 characters")
+        return
+      }
+
       poastElement.value = "" // boom!
 
       var request = new XMLHttpRequest()

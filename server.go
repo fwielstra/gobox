@@ -32,8 +32,13 @@ func parsePoast(r io.Reader) (poast, error) {
 	// creating two poasts.
 	if parseError == nil {
 		// max 1000 characters (arbitrary)
-		max := int(math.Min(float64(len(rawPoast.Poast)), 1000))
-		sanitizedPoast := poast{Username: policy.Sanitize(rawPoast.Username), Poast: policy.Sanitize(rawPoast.Poast[:max]), Poasted: time.Now()}
+		maxPoastLength := int(math.Min(float64(len(rawPoast.Poast)), 1000))
+		maxUsernameLength := int(math.Min(float64(len(rawPoast.Username)), 20))
+		sanitizedPoast := poast{
+			Username: policy.Sanitize(rawPoast.Username[:maxUsernameLength]),
+			Poast:    policy.Sanitize(rawPoast.Poast[:maxPoastLength]),
+			Poasted:  time.Now(),
+		}
 		return sanitizedPoast, nil
 	}
 
