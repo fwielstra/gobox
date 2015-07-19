@@ -53,45 +53,10 @@
     function pad(val, len) {
         val = String(val);
         len = len || 2;
-        while (val.length < len) val = "0" + val;
+        while (val.length < len) {
+          val = "0" + val;
+        }
         return val;
-    };
-
-    var form = document.querySelector("#shoutbox-form")
-    form.onsubmit = function submitForm(event) {
-      event.preventDefault()
-
-      var naemElement = form.elements["naem"]
-      var poastElement = form.elements["poast"]
-
-      var message = {
-        Username: naemElement.value,
-        Poast: poastElement.value
-      }
-
-      if (isBlank(message.Username) || isBlank(message.Poast)) {
-        alert("Fill in a username and message y0")
-        return
-      }
-
-      if (message.Poast.length > 1000) {
-        alert("Message too long; arbitrary limit is 1000 characters");
-        return
-      }
-
-      if (message.Username.length > 20) {
-        alert("Username too long; max 20 characters")
-        return
-      }
-
-      poastElement.value = "" // boom!
-
-      var request = new XMLHttpRequest()
-      request.onload = poastRequestListener
-      request.open("POST", "/poast")
-      request.send(JSON.stringify(message))
-
-      return false
     }
 
     function parseSmileys(poast) {
@@ -99,7 +64,7 @@
     }
 
     function poastRequestListener() {
-      poasts = JSON.parse(this.responseText)
+      var poasts = JSON.parse(this.responseText)
       poasts.forEach(function (poast) {
         poast.Poasted = new Date(Date.parse(poast.Poasted))
         poast.Poast = linkify(poast.Poast)
@@ -137,6 +102,43 @@
 
         poastContainer.appendChild(poastDiv)
       })
+    }
+
+    var form = document.querySelector("#shoutbox-form")
+    form.onsubmit = function submitForm(event) {
+      event.preventDefault()
+
+      var naemElement = form.elements.naem
+      var poastElement = form.elements.poast
+
+      var message = {
+        Username: naemElement.value,
+        Poast: poastElement.value
+      }
+
+      if (isBlank(message.Username) || isBlank(message.Poast)) {
+        alert("Fill in a username and message y0")
+        return
+      }
+
+      if (message.Poast.length > 1000) {
+        alert("Message too long; arbitrary limit is 1000 characters");
+        return
+      }
+
+      if (message.Username.length > 20) {
+        alert("Username too long; max 20 characters")
+        return
+      }
+
+      poastElement.value = "" // boom!
+
+      var request = new XMLHttpRequest()
+      request.onload = poastRequestListener
+      request.open("POST", "/poast")
+      request.send(JSON.stringify(message))
+
+      return false
     }
 
     function loadNewPoasts() {
