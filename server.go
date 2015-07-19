@@ -18,6 +18,11 @@ type poast struct {
 }
 
 var poasts []poast
+var policy *bluemonday.Policy
+
+func initPolicy() {
+	policy = bluemonday.UGCPolicy()
+}
 
 func parsePoast(r io.Reader) (poast, error) {
 	var rawPoast poast
@@ -26,8 +31,7 @@ func parsePoast(r io.Reader) (poast, error) {
 	// sanitize input. TODO: see if there's a way to sanitize during json decoding instead of
 	// creating two poasts.
 	if parseError == nil {
-		sanitizer := bluemonday.UGCPolicy()
-		sanitizedPoast := poast{Username: sanitizer.Sanitize(rawPoast.Username), Poast: sanitizer.Sanitize(rawPoast.Poast), Poasted: time.Now()}
+		sanitizedPoast := poast{Username: policy.Sanitize(rawPoast.Username), Poast: policy.Sanitize(rawPoast.Poast), Poasted: time.Now()}
 		return sanitizedPoast, nil
 	}
 
@@ -58,6 +62,7 @@ func writeError(code int, error string, w http.ResponseWriter) {
 }
 
 func main() {
+	initPolicy()
 	poasts = []poast{}
 
 	http.HandleFunc("/poast", func(w http.ResponseWriter, r *http.Request) {
