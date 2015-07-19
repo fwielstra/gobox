@@ -42,6 +42,11 @@
         return
       }
 
+      if (message.Poast.length > 1000) {
+        alert("Message too long; arbitrary limit is 1000 characters");
+        return
+      }
+
       poastElement.value = "" // boom!
 
       var request = new XMLHttpRequest()

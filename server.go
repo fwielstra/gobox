@@ -31,7 +31,9 @@ func parsePoast(r io.Reader) (poast, error) {
 	// sanitize input. TODO: see if there's a way to sanitize during json decoding instead of
 	// creating two poasts.
 	if parseError == nil {
-		sanitizedPoast := poast{Username: policy.Sanitize(rawPoast.Username), Poast: policy.Sanitize(rawPoast.Poast), Poasted: time.Now()}
+		// max 1000 characters (arbitrary)
+		max := int(math.Min(float64(len(rawPoast.Poast)), 1000))
+		sanitizedPoast := poast{Username: policy.Sanitize(rawPoast.Username), Poast: policy.Sanitize(rawPoast.Poast[:max]), Poasted: time.Now()}
 		return sanitizedPoast, nil
 	}
 
