@@ -25,6 +25,13 @@
         return (!str || /^\s*$/.test(str))
     }
 
+    function pad(val, len) {
+        val = String(val);
+        len = len || 2;
+        while (val.length < len) val = "0" + val;
+        return val;
+    };
+
     var form = document.querySelector("#shoutbox-form")
     form.onsubmit = function submitForm(event) {
       event.preventDefault()
@@ -77,7 +84,7 @@
         var timeSpan = document.createElement("span")
         timeSpan.className = "poasted"
         var poasted = new Date(poast.Poasted)
-        timeSpan.appendChild(document.createTextNode("[" + poasted.getHours() + ":" + poasted.getMinutes() + ":" + poasted.getSeconds() + "] "))
+        timeSpan.appendChild(document.createTextNode("[" + pad(poasted.getHours(), 2) + ":" + pad(poasted.getMinutes(), 2) + ":" + pad(poasted.getSeconds(), 2) + "] "))
 
         var usernameSpan = document.createElement("span")
         usernameSpan.className = "username"
