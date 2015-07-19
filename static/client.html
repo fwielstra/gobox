@@ -1,5 +1,14 @@
 <html>
   <head>
+    <style>
+    .poasted, .username, .poast {
+      padding-right: 5px;
+    }
+
+    .username {
+      text-align: right;
+    }
+    </style>
   </head>
   <body>
     <h1>box of shouts</h1>
@@ -86,20 +95,20 @@
       }
 
       poasts.forEach(function(poast) {
-        var timeSpan = document.createElement("span")
+        var timeSpan = document.createElement("td")
         timeSpan.className = "poasted"
         var poasted = new Date(poast.Poasted)
         timeSpan.appendChild(document.createTextNode("[" + pad(poasted.getHours(), 2) + ":" + pad(poasted.getMinutes(), 2) + ":" + pad(poasted.getSeconds(), 2) + "] "))
 
-        var usernameSpan = document.createElement("span")
+        var usernameSpan = document.createElement("td")
         usernameSpan.className = "username"
         usernameSpan.appendChild(document.createTextNode(poast.Username + ": "))
 
-        var poastSpan = document.createElement("span")
+        var poastSpan = document.createElement("td")
         poastSpan.className = "poast"
         poastSpan.innerHTML = poast.Poast
 
-        var poastDiv = document.createElement("div")
+        var poastDiv = document.createElement("tr")
         poastDiv.appendChild(timeSpan)
         poastDiv.appendChild(usernameSpan)
         poastDiv.appendChild(poastSpan)
